@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPGRADER.BRAINROT - Premium Meme Skin Upgrader</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Yandex Games SDK v2 -->
+    <script src="https://yandex.ru/games/sdk/v2"></script>
+</head>
+<body>
+
+    <!-- TOP LIVE FEED (CS2 STYLE) -->
+    <div class="live-ticker-wrap">
+        <div class="ticker-label">
+            <span class="live-dot"></span> LIVE UPGRADES
+        </div>
+        <div class="live-ticker-feed" id="live-feed"></div>
+    </div>
+
+    <!-- TOP HEADER -->
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-logo">
+                <span class="logo-accent">UP</span>GRADER
+            </div>
+            <span class="brand-tag">BRAINROT VIP</span>
+        </div>
+
+        <!-- PLAYER XP & LEVEL -->
+        <div class="player-level-pill" id="btn-open-level" title="Your level and progression">
+            <div class="level-badge" id="hud-level-badge">LVL 1</div>
+            <div class="level-progress-col">
+                <div class="level-title-row">
+                    <span class="level-rank-name" id="hud-rank-name">ROOKIE</span>
+                    <span class="level-xp-text" id="hud-xp-text">0 / 100 XP</span>
+                </div>
+                <div class="level-bar-track">
+                    <div class="level-bar-fill" id="hud-xp-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-panel">
+            <!-- Daily Wheel Button -->
+            <button id="btn-daily-wheel" class="btn-action-gold pulse-btn" title="Free Daily Fortune Wheel">
+                <span>🎁</span> DAILY WHEEL
+            </button>
+
+            <!-- Chat Button -->
+            <button id="btn-toggle-chat" class="btn-icon" title="Toggle Live Chat">
+                <span>💬</span>
+            </button>
+
+            <!-- Sound Toggle -->
+            <button id="btn-sound-toggle" class="btn-icon" title="Toggle Sound">
+                <span id="sound-icon">🔊</span>
+            </button>
+
+            <!-- Balance Display -->
+            <div class="balance-container">
+                <div class="balance-icon">🪙</div>
+                <div class="balance-info">
+                    <span class="balance-label">BALANCE</span>
+                    <span class="balance-num" id="player-balance">1,500</span>
+                </div>
+            </div>
+
+            <!-- Ad Reward Button -->
+            <button id="btn-free-coins" class="btn-action-green pulse-btn" title="Watch short ad for free coins">
+                <span class="btn-ico">🎬</span> +2,000
+            </button>
+
+            <!-- Profile & Net Worth Button -->
+            <div class="profile-badge-btn" id="btn-open-profile" title="Profile, stats and quick sell">
+                <div class="profile-avatar">🕶️</div>
+                <div class="profile-info">
+                    <span class="profile-label">INVENTORY</span>
+                    <span class="profile-inv-val" id="profile-inv-val">🪙 0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN UPGRADE ARENA -->
+    <main class="arena-layout" id="main-arena">
+
+        <!-- LEFT COLUMN: SOURCE BET (MULTI-SELECTION) -->
+        <section class="slot-panel" id="source-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-tag">STEP 1</span>
+                    <h2>YOUR BET</h2>
+                </div>
+                <div class="selected-stats">
+                    <span id="source-count-badge" class="count-badge">0 / 6</span>
+                    <button id="btn-clear-sources" class="btn-tiny" title="Clear selection">✕</button>
+                </div>
+            </div>
+
+            <div class="chosen-items-zone" id="chosen-sources-zone">
+                <div class="zone-empty-state">
+                    <span class="empty-icon">➕</span>
+                    <p>Click brainrots in inventory below</p>
+                    <span class="sub-hint">Stack up to 6 items for maximum win odds!</span>
+                </div>
+            </div>
+
+            <div class="bet-summary-bar">
+                <span class="summary-label">TOTAL WAGER:</span>
+                <span class="summary-val" id="total-source-val">🪙 0</span>
+            </div>
+        </section>
+
+        <!-- CENTER: UPGRADE WHEEL, TURBO, DIRECTION & PROVABLY FAIR -->
+        <section class="wheel-panel">
+            
+            <!-- WHEEL CONTROLS: DIRECTION & TURBO -->
+            <div class="wheel-toggles-bar">
+                <div class="toggle-group">
+                    <span class="toggle-title">DIRECTION:</span>
+                    <button class="btn-toggle-chip active" id="btn-dir-right" title="Spin Clockwise">
+                        ↻ CLOCKWISE
+                    </button>
+                    <button class="btn-toggle-chip" id="btn-dir-left" title="Spin Counter-Clockwise">
+                        ↺ COUNTER-CW
+                    </button>
+                </div>
+
+                <div class="toggle-group">
+                    <button class="btn-turbo-chip" id="btn-turbo-toggle" title="Instant 0.7s spin speed">
+                        ⚡ TURBO: <span id="turbo-status-text">OFF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ODDS & MULTIPLIER -->
+            <div class="wheel-meta">
+                <div class="meta-item">
+                    <span class="meta-title">WIN CHANCE</span>
+                    <span class="meta-number" id="chance-display">0.00%</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-title">MULTIPLIER</span>
+                    <span class="meta-number mult" id="multiplier-display">x0.00</span>
+                </div>
+            </div>
+
+            <!-- WHEEL CANVAS -->
+            <div class="roulette-box">
+                <div class="roulette-outer-glow"></div>
+                <canvas id="wheel-canvas" width="340" height="340"></canvas>
+                <div class="roulette-needle-top"></div>
+                
+                <div class="wheel-core">
+                    <div class="core-arrow-indicator">▲</div>
+                    <span class="core-chance-label">CHANCE</span>
+                    <span class="core-chance-val" id="core-chance-text">0%</span>
+                </div>
+            </div>
+
+            <!-- ACTION CONTROLS -->
+            <div class="arena-controls">
+                <button id="btn-boost-chance" class="btn-boost" disabled>
+                    <span class="boost-ico">🍀</span> +15% CHANCE BOOST (AD)
+                </button>
+
+                <button id="btn-upgrade" class="btn-spin-action" disabled>
+                    <span class="spin-glow"></span>
+                    <span class="btn-text">START UPGRADE</span>
+                </button>
+            </div>
+
+            <!-- PROVABLY FAIR -->
+            <div class="provably-fair-bar" id="btn-open-provably" title="Verify round cryptographic fairness">
+                <span class="pf-shield">🛡️</span>
+                <span class="pf-label">PROVABLY FAIR:</span>
+                <span class="pf-hash" id="round-hash-display">9a8f...4e1b</span>
+                <span class="pf-check-link">[Verify]</span>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: DESIRED DROP & QUICK ODDS SELECTOR -->
+        <section class="slot-panel" id="target-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-tag">STEP 2</span>
+                    <h2>DESIRED DROP</h2>
+                </div>
+            </div>
+
+            <div class="chosen-target-zone" id="chosen-target-zone">
+                <div class="zone-empty-state">
+                    <span class="empty-icon">🎯</span>
+                    <p>Select target from catalog below</p>
+                    <span class="sub-hint">Or use 2X, 50% quick buttons below!</span>
+                </div>
+            </div>
+
+            <!-- QUICK ODDS SELECTOR -->
+            <div class="quick-odds-target-box">
+                <div class="quick-target-title">QUICK TARGET PICKER:</div>
+                <div class="quick-odds-grid">
+                    <button class="btn-quick-odd" data-type="mult" data-val="2">2X</button>
+                    <button class="btn-quick-odd" data-type="mult" data-val="4">4X</button>
+                    <button class="btn-quick-odd" data-type="mult" data-val="8">8X</button>
+                    <button class="btn-quick-odd" data-type="chance" data-val="75">75%</button>
+                    <button class="btn-quick-odd" data-type="chance" data-val="50">50%</button>
+                    <button class="btn-quick-odd" data-type="chance" data-val="35">35%</button>
+                </div>
+            </div>
+
+            <div class="bet-summary-bar target-bar">
+                <span class="summary-label">TARGET VALUE:</span>
+                <span class="summary-val target-val" id="target-val">🪙 0</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BOTTOM HUB: INVENTORY / SHOP / TARGETS / CASES / CONTRACTS / DUELS -->
+    <section class="hub-browser">
+        <div class="hub-nav">
+            <div class="hub-tabs">
+                <button class="hub-tab active" data-tab="inventory">
+                    🎒 INVENTORY <span class="tab-badge" id="inv-count-badge">0</span>
+                </button>
+                <button class="hub-tab" data-tab="shop">
+                    🛒 SHOP
+                </button>
+                <button class="hub-tab" data-tab="target-catalog">
+                    🎯 TARGETS
+                </button>
+                <button class="hub-tab" data-tab="cases">
+                    📦 CASES
+                </button>
+                <button class="hub-tab" data-tab="contracts">
+                    📜 CONTRACTS
+                </button>
+                <button class="hub-tab" data-tab="battles">
+                    ⚔️ BOT BATTLES
+                </button>
+            </div>
+
+            <div class="hub-actions">
+                <button id="btn-select-all-low" class="btn-ghost-sm" data-tab-action="inventory">
+                    Select All Cheapest
+                </button>
+                <button id="btn-sell-from-tab" class="btn-ghost-gold">
+                    💰 Quick Sell
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. INVENTORY -->
+        <div class="hub-content active" id="tab-inventory">
+            <div class="items-grid" id="inventory-grid"></div>
+        </div>
+
+        <!-- 2. SHOP -->
+        <div class="hub-content" id="tab-shop">
+            <div class="shop-banner">
+                <span>💡 Buy Italian brainrots directly with coins or watch short video ads to refill your balance!</span>
+            </div>
+            <div class="items-grid" id="shop-grid"></div>
+        </div>
+
+        <!-- 3. TARGET CATALOG -->
+        <div class="hub-content" id="tab-target-catalog">
+            <div class="items-grid" id="target-catalog-grid"></div>
+        </div>
+
+        <!-- 4. CASES -->
+        <div class="hub-content" id="tab-cases">
+            <div class="cases-row">
+                <div class="case-card">
+                    <div class="case-glow common-glow"></div>
+                    <div class="case-icon">📦</div>
+                    <h3>ROOKIE CASE</h3>
+                    <p class="case-desc">Chipi Chapa, Capybara, Doge, Amogus, Pop Cat & Pedro</p>
+                    <div class="case-price">🪙 200</div>
+                    <button class="btn-buy-case" onclick="triggerCaseOpening('cheap')">OPEN CASE</button>
+                </div>
+
+                <div class="case-card featured">
+                    <div class="case-badge-hot">POPULAR</div>
+                    <div class="case-glow epic-glow"></div>
+                    <div class="case-icon">🎁</div>
+                    <h3>SIGMA CASE</h3>
+                    <p class="case-desc">Cappuccina, Skibidi Pizza, Freddy, Grimace & Bombombini!</p>
+                    <div class="case-price">🪙 850</div>
+                    <button class="btn-buy-case btn-gold" onclick="triggerCaseOpening('medium')">OPEN CASE</button>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-glow god-glow"></div>
+                    <div class="case-icon">👑</div>
+                    <h3>BARON CASE</h3>
+                    <p class="case-desc">Skibidi Toilet, Sunshine LeBron, Chill Guy, Tralalero & GigaChad!</p>
+                    <div class="case-price">🪙 4,000</div>
+                    <button class="btn-buy-case" onclick="triggerCaseOpening('rich')">OPEN CASE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. TRADE-UP CONTRACTS -->
+        <div class="hub-content" id="tab-contracts">
+            <div class="contract-arena">
+                <div class="contract-header">
+                    <h3>📜 CS2 STYLE TRADE-UP CONTRACT</h3>
+                    <p>Load 5 brainrots of matching or near tiers to craft 1 GUARANTEED item of the next tier!</p>
+                </div>
+                
+                <div class="contract-slots-row" id="contract-slots-container">
+                    <!-- 5 Crafting Slots -->
+                </div>
+
+                <div class="contract-actions">
+                    <button id="btn-contract-autofill" class="btn-secondary-action">
+                        ⚡ Auto-Fill 5 Cheapest
+                    </button>
+                    <button id="btn-forge-contract" class="btn-forge-action" disabled>
+                        🔥 SIGN CONTRACT & CRAFT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. BOT BATTLES -->
+        <div class="hub-content" id="tab-battles">
+            <div class="battles-arena">
+                <div class="battles-header">
+                    <h3>⚔️ UPGRADE DUELS AGAINST BOTS</h3>
+                    <p>Choose an opponent bot. Both players wager a brainrot. The winner takes both items!</p>
+                </div>
+
+                <div class="bots-grid">
+                    <div class="bot-card" data-bot="skibidi">
+                        <div class="bot-avatar">🐵</div>
+                        <h4>BOT CHIMPANZINI</h4>
+                        <span class="bot-tier-tag">Easy • Wager: 🪙 150-450</span>
+                        <p>Wagers Chipi Chapa & Chimpanzini. Fun high-risk gambler.</p>
+                        <button class="btn-duel-start" onclick="startBotDuel('skibidi')">START DUEL</button>
+                    </div>
+
+                    <div class="bot-card featured" data-bot="sigma">
+                        <div class="bot-badge-hot">POPULAR</div>
+                        <div class="bot-avatar">🦐</div>
+                        <h4>BOT TRIPPI TROPPI</h4>
+                        <span class="bot-tier-tag epic-tag">Medium • Wager: 🪙 750-3,500</span>
+                        <p>Wagers Cappuccina & Trippi Troppi. Serious challenge.</p>
+                        <button class="btn-duel-start btn-gold" onclick="startBotDuel('sigma')">START DUEL</button>
+                    </div>
+
+                    <div class="bot-card" data-bot="baron">
+                        <div class="bot-avatar">🦈</div>
+                        <h4>BOT TRALALERO</h4>
+                        <span class="bot-tier-tag god-tag">Boss • Wager: 🪙 6,500-25,000</span>
+                        <p>Wagers Tralalero Tralala & Shailushai. Massive jackpot!</p>
+                        <button class="btn-duel-start" onclick="startBotDuel('baron')">START DUEL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE CHAT PANEL -->
+    <aside class="live-chat-panel" id="live-chat-panel">
+        <div class="chat-header">
+            <div class="chat-title-group">
+                <span class="chat-dot"></span>
+                <h3>LIVE CHAT</h3>
+            </div>
+            <button class="btn-chat-close" id="btn-chat-close">✕</button>
+        </div>
+
+        <div class="chat-messages-scroll" id="chat-messages">
+            <!-- Messages stream in real-time -->
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="chat-input-text" placeholder="Type a message..." maxlength="80">
+            <button id="btn-chat-send" class="btn-chat-send">➤</button>
+        </div>
+    </aside>
+
+    <!-- MODAL: DAILY FORTUNE WHEEL -->
+    <div class="overlay-modal" id="modal-daily-wheel">
+        <div class="modal-box daily-wheel-box">
+            <div class="case-modal-header">
+                <span class="case-modal-tag">🎁 DAILY FORTUNE WHEEL</span>
+                <button class="case-modal-close" id="btn-daily-close">✕</button>
+            </div>
+
+            <p class="daily-hint">Spin the fortune wheel every 24 hours or watch an ad for extra spins!</p>
+
+            <div class="daily-wheel-canvas-wrap">
+                <div class="daily-wheel-marker">▼</div>
+                <canvas id="daily-canvas" width="320" height="320"></canvas>
+            </div>
+
+            <div class="daily-actions">
+                <button id="btn-spin-daily-free" class="btn-gold-action pulse-btn">
+                    SPIN FOR FREE
+                </button>
+                <button id="btn-spin-daily-ad" class="btn-action-green" style="display:none;">
+                    🎬 EXTRA SPIN (WATCH AD)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BOT DUEL -->
+    <div class="overlay-modal" id="modal-duel">
+        <div class="modal-box duel-modal-box">
+            <div class="case-modal-header">
+                <span class="case-modal-tag" id="duel-title-tag">⚔️ MEME DUEL</span>
+                <button class="case-modal-close" id="btn-duel-close">✕</button>
+            </div>
+
+            <div class="duel-fighters-row">
+                <div class="duel-side player-side">
+                    <span class="duel-player-label">YOU</span>
+                    <div class="duel-item-card" id="duel-player-item"></div>
+                </div>
+
+                <div class="duel-vs-badge">VS</div>
+
+                <div class="duel-side bot-side">
+                    <span class="duel-player-label" id="duel-bot-name">BOT</span>
+                    <div class="duel-item-card" id="duel-bot-item"></div>
+                </div>
+            </div>
+
+            <div class="duel-wheel-wrap">
+                <canvas id="duel-canvas" width="280" height="280"></canvas>
+                <div class="duel-wheel-pointer">▲</div>
+            </div>
+
+            <div class="duel-actions">
+                <button id="btn-start-duel-roll" class="btn-spin-action">
+                    ROLL DUEL!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PROVABLY FAIR -->
+    <div class="overlay-modal" id="modal-provably-fair">
+        <div class="modal-box pf-modal-box">
+            <div class="case-modal-header">
+                <span class="case-modal-tag">🛡️ PROVABLY FAIR VERIFICATION</span>
+                <button class="case-modal-close" id="btn-pf-close">✕</button>
+            </div>
+            <p class="pf-desc">Every round result is cryptographically hashed and predetermined BEFORE you spin. No rigged outcomes!</p>
+            
+            <div class="pf-data-box">
+                <div class="pf-row">
+                    <span class="pf-key">Round Hash (SHA-256):</span>
+                    <input type="text" id="pf-current-hash" readonly class="pf-input">
+                </div>
+                <div class="pf-row">
+                    <span class="pf-key">Server Seed (Secret):</span>
+                    <input type="text" id="pf-server-seed" readonly class="pf-input">
+                </div>
+                <div class="pf-row">
+                    <span class="pf-key">Client Seed:</span>
+                    <input type="text" id="pf-client-seed" readonly class="pf-input">
+                </div>
+            </div>
+
+            <button class="btn-dark-subtle" id="btn-pf-ok" style="width:100%; margin-top: 14px;">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- MODAL: PLAYER PROFILE, STATS & SELL -->
+    <div class="overlay-modal" id="modal-profile">
+        <div class="modal-box profile-modal-box">
+            <div class="profile-modal-header">
+                <div class="pmh-user">
+                    <div class="pmh-avatar">🕶️</div>
+                    <div class="pmh-details">
+                        <h2>PLAYER PROFILE</h2>
+                        <span class="pmh-rank" id="pmh-full-rank">ROOKIE • LEVEL 1</span>
+                    </div>
+                </div>
+                <button class="case-modal-close" id="btn-profile-close">✕</button>
+            </div>
+
+            <!-- Profile Dashboard Stats -->
+            <div class="profile-stats-dashboard">
+                <div class="dash-stat">
+                    <span class="dash-label">NET WORTH</span>
+                    <span class="dash-val" id="pmh-total-val">🪙 0</span>
+                </div>
+                <div class="dash-stat">
+                    <span class="dash-label">COINS</span>
+                    <span class="dash-val gold-val" id="pmh-balance-val">🪙 0</span>
+                </div>
+                <div class="dash-stat">
+                    <span class="dash-label">UPGRADES</span>
+                    <span class="dash-val" id="pmh-total-upgrades">0</span>
+                </div>
+                <div class="dash-stat">
+                    <span class="dash-label">WIN RATE</span>
+                    <span class="dash-val green-val" id="pmh-winrate">0%</span>
+                </div>
+            </div>
+
+            <div class="profile-actions-bar">
+                <span class="pmh-inv-count" id="pmh-count">0 items owned</span>
+                <button id="btn-sell-all-inventory" class="btn-sell-all">
+                    💸 SELL ALL ITEMS
+                </button>
+            </div>
+
+            <!-- Inventory Grid -->
+            <div class="profile-inv-scroll">
+                <div class="profile-items-grid" id="profile-items-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CS2 CASE OPENING ROULETTE -->
+    <div class="overlay-modal" id="modal-case-roulette">
+        <div class="modal-box case-roulette-box">
+            <div class="case-modal-header">
+                <span class="case-modal-tag" id="cr-case-name">CASE OPENING</span>
+                <button class="case-modal-close" id="btn-cr-close" style="display:none;">✕</button>
+            </div>
+
+            <div class="roulette-viewport">
+                <div class="roulette-center-marker top-marker"></div>
+                <div class="roulette-center-marker bottom-marker"></div>
+                <div class="roulette-tape" id="roulette-tape"></div>
+            </div>
+
+            <div class="case-result-zone" id="case-result-zone" style="display: none;">
+                <div class="case-win-label">YOU WON:</div>
+                <div class="case-win-card" id="case-win-card"></div>
+                <div class="case-actions">
+                    <button id="btn-claim-case-drop" class="btn-spin-action">CLAIM TO INVENTORY</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SPONSOR AD SIMULATOR -->
+    <div class="overlay-modal" id="modal-ad">
+        <div class="modal-box ad-theme">
+            <div class="ad-video-mock">
+                <div class="ad-countdown" id="ad-countdown">3</div>
+                <div class="ad-tv-icon">📺</div>
+            </div>
+            <h3>SPONSOR ADVERTISEMENT</h3>
+            <p>Playing short rewarded video ad to grant your bonus...</p>
+            <div class="loader-line"><div class="loader-line-bar" id="ad-progress"></div></div>
+        </div>
+    </div>
+
+    <!-- MODAL: RESCUE SAVED BURNED ITEMS -->
+    <div class="overlay-modal" id="modal-rescue">
+        <div class="modal-box rescue-theme">
+            <div class="skull-anim">💀</div>
+            <h2 class="danger-title">UPGRADE FAILED!</h2>
+            <p class="rescue-text">
+                You burned items worth: <b id="rescue-burn-cost">0 🪙</b>
+            </p>
+            <div class="rescue-btn-group">
+                <button id="btn-rescue-ad" class="btn-gold-action pulse-btn">
+                    <span>🛡️</span> RESCUE ALL ITEMS (WATCH AD)!
+                </button>
+                <button id="btn-rescue-decline" class="btn-dark-subtle">
+                    Accept Loss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: UPGRADE SUCCESSFUL WIN -->
+    <div class="overlay-modal" id="modal-win">
+        <div class="modal-box win-theme">
+            <div class="win-trophy">⚡</div>
+            <h2 class="win-heading">UPGRADE SUCCESSFUL!</h2>
+            <div class="win-preview-card" id="win-card-target"></div>
+            
+            <div class="win-btn-group">
+                <button id="btn-win-double" class="btn-gold-action pulse-btn">
+                    <span>✨</span> DOUBLE DROP (2X) (WATCH AD)!
+                </button>
+                <button id="btn-win-claim" class="btn-spin-action">
+                    CLAIM TO INVENTORY
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
